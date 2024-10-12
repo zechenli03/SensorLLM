@@ -1,0 +1,257 @@
+ts_backbone_type: "chronos"
+
+chronos_model:
+  name: "chronos-t5-large"
+  encoder_output_dim: 1024
+  projection_hidden_layer: 1
+  projection_hidden_dim: [2048]
+  last_token: true
+
+dropout_rate: 0.3
+default_ts_token: "<ts>"
+
+usc-had:
+  id2label:
+        0: "1. Walking Forward"
+        1: "2. Walking Left"
+        2: "3. Walking Right"
+        3: "4. Walking Upstairs"
+        4: "5. Walking Downstairs"
+        5: "6. Running Forward"
+        6: "7. Jumping"
+        7: "8. Sitting"
+        8: "9. Standing"
+        9: "10. Sleeping"
+        10: "11. Elevator Up"
+        11: "12. Elevator Down"
+  num_labels: 12
+  channel_num: 6
+  sample_rate: 100
+  default_x_acc_start_token: "<x_acc_start>"
+  default_x_acc_end_token: "<x_acc_end>"
+  default_y_acc_start_token: "<y_acc_start>"
+  default_y_acc_end_token: "<y_acc_end>"
+  default_z_acc_start_token: "<z_acc_start>"
+  default_z_acc_end_token: "<z_acc_end>"
+  default_x_gyro_start_token: "<x_gyro_start>"
+  default_x_gyro_end_token: "<x_gyro_end>"
+  default_y_gyro_start_token: "<y_gyro_start>"
+  default_y_gyro_end_token: "<y_gyro_end>"
+  default_z_gyro_start_token: "<z_gyro_start>"
+  default_z_gyro_end_token: "<z_gyro_end>"
+
+uci:
+  id2label:
+        0: "Walking"
+        1: "Walking upstairs"
+        2: "Walking downstairs"
+        3: "Sitting"
+        4: "Standing"
+        5: "Laying"
+  num_labels: 6
+  channel_num: 6
+  sample_rate: 50
+  default_x_acc_start_token: "<x_acc_start>"
+  default_x_acc_end_token: "<x_acc_end>"
+  default_y_acc_start_token: "<y_acc_start>"
+  default_y_acc_end_token: "<y_acc_end>"
+  default_z_acc_start_token: "<z_acc_start>"
+  default_z_acc_end_token: "<z_acc_end>"
+  default_x_gyro_start_token: "<x_gyro_start>"
+  default_x_gyro_end_token: "<x_gyro_end>"
+  default_y_gyro_start_token: "<y_gyro_start>"
+  default_y_gyro_end_token: "<y_gyro_end>"
+  default_z_gyro_start_token: "<z_gyro_start>"
+  default_z_gyro_end_token: "<z_gyro_end>"
+
+mhealth:
+  id2label:
+    0: 'Standing still (1 min)'
+    1: 'Sitting and relaxing (1 min)'
+    2: 'Lying down (1 min)'
+    3: 'Walking (1 min)'
+    4: 'Climbing stairs (1 min)'
+    5: 'Waist bends forward (20x)'
+    6: 'Frontal elevation of arms (20x)'
+    7: 'Knees bending (crouching) (20x)'
+    8: 'Cycling (1 min)'
+    9: 'Jogging (1 min)'
+    10: 'Running (1 min)'
+    11: 'Jump front & back (20x)'
+  num_labels: 12
+  channel_num: 15
+  sample_rate: 50
+  default_chest_x_acc_start_token: "<chest_x_acc_start>"
+  default_chest_x_acc_end_token: "<chest_x_acc_end>"
+  default_chest_y_acc_start_token: "<chest_y_acc_start>"
+  default_chest_y_acc_end_token: "<chest_y_acc_end>"
+  default_chest_z_acc_start_token: "<chest_z_acc_start>"
+  default_chest_z_acc_end_token: "<chest_z_acc_end>"
+  default_left_ankle_x_acc_start_token: "<la_x_acc_start>"
+  default_left_ankle_x_acc_end_token: "<la_x_acc_end>"
+  default_left_ankle_y_acc_start_token: "<la_y_acc_start>"
+  default_left_ankle_y_acc_end_token: "<la_y_acc_end>"
+  default_left_ankle_z_acc_start_token: "<la_z_acc_start>"
+  default_left_ankle_z_acc_end_token: "<la_z_acc_end>"
+  default_left_ankle_x_gyro_start_token: "<la_x_gyro_start>"
+  default_left_ankle_x_gyro_end_token: "<la_x_gyro_end>"
+  default_left_ankle_y_gyro_start_token: "<la_y_gyro_start>"
+  default_left_ankle_y_gyro_end_token: "<la_y_gyro_end>"
+  default_left_ankle_z_gyro_start_token: "<la_z_gyro_start>"
+  default_left_ankle_z_gyro_end_token: "<la_z_gyro_end>"
+  default_right_lower_arm_x_acc_start_token: "<rla_x_acc_start>"
+  default_right_lower_arm_x_acc_end_token: "<rla_x_acc_end>"
+  default_right_lower_arm_y_acc_start_token: "<rla_y_acc_start>"
+  default_right_lower_arm_y_acc_end_token: "<rla_y_acc_end>"
+  default_right_lower_arm_z_acc_start_token: "<rla_z_acc_start>"
+  default_right_lower_arm_z_acc_end_token: "<rla_z_acc_end>"
+  default_right_lower_arm_x_gyro_start_token: "<rla_x_gyro_start>"
+  default_right_lower_arm_x_gyro_end_token: "<rla_x_gyro_end>"
+  default_right_lower_arm_y_gyro_start_token: "<rla_y_gyro_start>"
+  default_right_lower_arm_y_gyro_end_token: "<rla_y_gyro_end>"
+  default_right_lower_arm_z_gyro_start_token: "<rla_z_gyro_start>"
+  default_right_lower_arm_z_gyro_end_token: "<rla_z_gyro_end>"
+
+pamap50:
+  id2label:
+    0: 'lying'
+    1: 'sitting'
+    2: 'standing'
+    3: 'walking'
+    4: 'running'
+    5: 'cycling'
+    6: 'Nordic walking'
+    7: 'ascending stairs'
+    8: 'descending stairs'
+    9: 'vacuum cleaning'
+    10: 'ironing'
+    11: 'rope jumping'
+  num_labels: 12
+  channel_num: 27
+  sample_rate: 50
+  default_chest_x_acc_start_token: "<chest_x_acc_start>"
+  default_chest_x_acc_end_token: "<chest_x_acc_end>"
+  default_chest_y_acc_start_token: "<chest_y_acc_start>"
+  default_chest_y_acc_end_token: "<chest_y_acc_end>"
+  default_chest_z_acc_start_token: "<chest_z_acc_start>"
+  default_chest_z_acc_end_token: "<chest_z_acc_end>"
+  default_chest_x_gyro_start_token: "<chest_x_gyro_start>"
+  default_chest_x_gyro_end_token: "<chest_x_gyro_end>"
+  default_chest_y_gyro_start_token: "<chest_y_gyro_start>"
+  default_chest_y_gyro_end_token: "<chest_y_gyro_end>"
+  default_chest_z_gyro_start_token: "<chest_z_gyro_start>"
+  default_chest_z_gyro_end_token: "<chest_z_gyro_end>"
+  default_chest_x_mag_start_token: "<chest_x_mag_start>"
+  default_chest_x_mag_end_token: "<chest_x_mag_end>"
+  default_chest_y_mag_start_token: "<chest_y_mag_start>"
+  default_chest_y_mag_end_token: "<chest_y_mag_end>"
+  default_chest_z_mag_start_token: "<chest_z_mag_start>"
+  default_chest_z_mag_end_token: "<chest_z_mag_end>"
+  default_ankle_x_acc_start_token: "<ankle_x_acc_start>"
+  default_ankle_x_acc_end_token: "<ankle_x_acc_end>"
+  default_ankle_y_acc_start_token: "<ankle_y_acc_start>"
+  default_ankle_y_acc_end_token: "<ankle_y_acc_end>"
+  default_ankle_z_acc_start_token: "<ankle_z_acc_start>"
+  default_ankle_z_acc_end_token: "<ankle_z_acc_end>"
+  default_ankle_x_gyro_start_token: "<ankle_x_gyro_start>"
+  default_ankle_x_gyro_end_token: "<ankle_x_gyro_end>"
+  default_ankle_y_gyro_start_token: "<ankle_y_gyro_start>"
+  default_ankle_y_gyro_end_token: "<ankle_y_gyro_end>"
+  default_ankle_z_gyro_start_token: "<ankle_z_gyro_start>"
+  default_ankle_z_gyro_end_token: "<ankle_z_gyro_end>"
+  default_ankle_x_mag_start_token: "<ankle_x_mag_start>"
+  default_ankle_x_mag_end_token: "<ankle_x_mag_end>"
+  default_ankle_y_mag_start_token: "<ankle_y_mag_start>"
+  default_ankle_y_mag_end_token: "<ankle_y_mag_end>"
+  default_ankle_z_mag_start_token: "<ankle_z_mag_start>"
+  default_ankle_z_mag_end_token: "<ankle_z_mag_end>"
+  default_hand_x_acc_start_token: "<hand_x_acc_start>"
+  default_hand_x_acc_end_token: "<hand_x_acc_end>"
+  default_hand_y_acc_start_token: "<hand_y_acc_start>"
+  default_hand_y_acc_end_token: "<hand_y_acc_end>"
+  default_hand_z_acc_start_token: "<hand_z_acc_start>"
+  default_hand_z_acc_end_token: "<hand_z_acc_end>"
+  default_hand_x_gyro_start_token: "<hand_x_gyro_start>"
+  default_hand_x_gyro_end_token: "<hand_x_gyro_end>"
+  default_hand_y_gyro_start_token: "<hand_y_gyro_start>"
+  default_hand_y_gyro_end_token: "<hand_y_gyro_end>"
+  default_hand_z_gyro_start_token: "<hand_z_gyro_start>"
+  default_hand_z_gyro_end_token: "<hand_z_gyro_end>"
+  default_hand_x_mag_start_token: "<hand_x_mag_start>"
+  default_hand_x_mag_end_token: "<hand_x_mag_end>"
+  default_hand_y_mag_start_token: "<hand_y_mag_start>"
+  default_hand_y_mag_end_token: "<hand_y_mag_end>"
+  default_hand_z_mag_start_token: "<hand_z_mag_start>"
+  default_hand_z_mag_end_token: "<hand_z_mag_end>"
+
+pamap:
+  id2label:
+    0: 'lying'
+    1: 'sitting'
+    2: 'standing'
+    3: 'walking'
+    4: 'running'
+    5: 'cycling'
+    6: 'Nordic walking'
+    7: 'ascending stairs'
+    8: 'descending stairs'
+    9: 'vacuum cleaning'
+    10: 'ironing'
+    11: 'rope jumping'
+  num_labels: 12
+  channel_num: 27
+  sample_rate: 100
+  default_chest_x_acc_start_token: "<chest_x_acc_start>"
+  default_chest_x_acc_end_token: "<chest_x_acc_end>"
+  default_chest_y_acc_start_token: "<chest_y_acc_start>"
+  default_chest_y_acc_end_token: "<chest_y_acc_end>"
+  default_chest_z_acc_start_token: "<chest_z_acc_start>"
+  default_chest_z_acc_end_token: "<chest_z_acc_end>"
+  default_chest_x_gyro_start_token: "<chest_x_gyro_start>"
+  default_chest_x_gyro_end_token: "<chest_x_gyro_end>"
+  default_chest_y_gyro_start_token: "<chest_y_gyro_start>"
+  default_chest_y_gyro_end_token: "<chest_y_gyro_end>"
+  default_chest_z_gyro_start_token: "<chest_z_gyro_start>"
+  default_chest_z_gyro_end_token: "<chest_z_gyro_end>"
+  default_chest_x_mag_start_token: "<chest_x_mag_start>"
+  default_chest_x_mag_end_token: "<chest_x_mag_end>"
+  default_chest_y_mag_start_token: "<chest_y_mag_start>"
+  default_chest_y_mag_end_token: "<chest_y_mag_end>"
+  default_chest_z_mag_start_token: "<chest_z_mag_start>"
+  default_chest_z_mag_end_token: "<chest_z_mag_end>"
+  default_ankle_x_acc_start_token: "<ankle_x_acc_start>"
+  default_ankle_x_acc_end_token: "<ankle_x_acc_end>"
+  default_ankle_y_acc_start_token: "<ankle_y_acc_start>"
+  default_ankle_y_acc_end_token: "<ankle_y_acc_end>"
+  default_ankle_z_acc_start_token: "<ankle_z_acc_start>"
+  default_ankle_z_acc_end_token: "<ankle_z_acc_end>"
+  default_ankle_x_gyro_start_token: "<ankle_x_gyro_start>"
+  default_ankle_x_gyro_end_token: "<ankle_x_gyro_end>"
+  default_ankle_y_gyro_start_token: "<ankle_y_gyro_start>"
+  default_ankle_y_gyro_end_token: "<ankle_y_gyro_end>"
+  default_ankle_z_gyro_start_token: "<ankle_z_gyro_start>"
+  default_ankle_z_gyro_end_token: "<ankle_z_gyro_end>"
+  default_ankle_x_mag_start_token: "<ankle_x_mag_start>"
+  default_ankle_x_mag_end_token: "<ankle_x_mag_end>"
+  default_ankle_y_mag_start_token: "<ankle_y_mag_start>"
+  default_ankle_y_mag_end_token: "<ankle_y_mag_end>"
+  default_ankle_z_mag_start_token: "<ankle_z_mag_start>"
+  default_ankle_z_mag_end_token: "<ankle_z_mag_end>"
+  default_hand_x_acc_start_token: "<hand_x_acc_start>"
+  default_hand_x_acc_end_token: "<hand_x_acc_end>"
+  default_hand_y_acc_start_token: "<hand_y_acc_start>"
+  default_hand_y_acc_end_token: "<hand_y_acc_end>"
+  default_hand_z_acc_start_token: "<hand_z_acc_start>"
+  default_hand_z_acc_end_token: "<hand_z_acc_end>"
+  default_hand_x_gyro_start_token: "<hand_x_gyro_start>"
+  default_hand_x_gyro_end_token: "<hand_x_gyro_end>"
+  default_hand_y_gyro_start_token: "<hand_y_gyro_start>"
+  default_hand_y_gyro_end_token: "<hand_y_gyro_end>"
+  default_hand_z_gyro_start_token: "<hand_z_gyro_start>"
+  default_hand_z_gyro_end_token: "<hand_z_gyro_end>"
+  default_hand_x_mag_start_token: "<hand_x_mag_start>"
+  default_hand_x_mag_end_token: "<hand_x_mag_end>"
+  default_hand_y_mag_start_token: "<hand_y_mag_start>"
+  default_hand_y_mag_end_token: "<hand_y_mag_end>"
+  default_hand_z_mag_start_token: "<hand_z_mag_start>"
+  default_hand_z_mag_end_token: "<hand_z_mag_end>"
