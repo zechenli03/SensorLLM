@@ -325,7 +325,7 @@ def train():
                 print(
                     '[WARNING] Attempting to use FSDP while {} parameters do not require gradients: {}...(omitted)'.format(
                         len(params_no_grad), ', '.join(params_no_grad[:10])))
-            rom torch.distributed.fsdp.fully_sharded_data_parallel import FullyShardedDataParallel as FSDP
+            from torch.distributed.fsdp.fully_sharded_data_parallel import FullyShardedDataParallel as FSDP
             def patch_FSDP_use_orig_params(func):
                 def wrap_func(*args, **kwargs):
                     use_orig_params = kwargs.pop('use_orig_params', True)
