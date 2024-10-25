@@ -16,7 +16,7 @@ from sensorllm.model import *
 from sensorllm.model.chronos_model import *
 from sensorllm.train.sensorllm_trainer import SensorLLMTrainer, SensorLLMWeightedCELossTrainer
 import logging as logger
-from sensorllm.data import make_ts_text_data_module, make_ts_text_data_module2, make_ts_text_data_module_stage2, make_ts_classification_data_module_stage2
+from sensorllm.data import make_ts_text_data_module, make_ts_text_data_module_stage2, make_ts_classification_data_module_stage2
 import warnings
 
 import evaluate
@@ -151,33 +151,10 @@ def check_model_parameters(model_or_params, print_details=False):
 
 
 def safe_save_model_for_hf_trainer(trainer: transformers.Trainer, output_dir: str):
-    """Collects the state dict and dump to disk."""
-    try:
-        from torch.distributed.fsdp import (
-            FullyShardedDataParallel as FSDP,
-            FullStateDictConfig,
-            StateDictType,
-        )
-        model = trainer.model
-        if isinstance(model, FSDP):
-            save_policy = FullStateDictConfig(offload_to_cpu=True, rank0_only=True)
-            with FSDP.state_dict_type(model, StateDictType.FULL_STATE_DICT, save_policy):
-                state_dict = model.state_dict()
-                cpu_state_dict = {key: value.cpu() for key, value in state_dict.items()}
-            if trainer.args.should_save:
-                trainer._save(output_dir, state_dict=cpu_state_dict)
-        else:
-            # If not using FSDP, save the model normally and move to CPU if needed
-            state_dict = trainer.model.state_dict()
-            cpu_state_dict = {key: value.cpu() for key, value in state_dict.items()}
-            if trainer.args.should_save:
-                trainer._save(output_dir, state_dict=cpu_state_dict)
-    except ImportError:
-        # If FSDP is not available, save the model normally and move to CPU if needed
-        state_dict = trainer.model.state_dict()
-        cpu_state_dict = {key: value.cpu() for key, value in state_dict.items()}
-        if trainer.args.should_save:
-            trainer._save(output_dir, state_dict=cpu_state_dict)
+    state_dict = trainer.model.state_dict()
+    cpu_state_dict = {key: value.cpu() for key, value in state_dict.items()}
+    if trainer.args.should_save:
+        trainer._save(output_dir, state_dict=cpu_state_dict)
 
 
 def train():
@@ -207,7 +184,7 @@ def train():
             logger.warning("Loaded CausalLM model.")
         else:
             logger.warning(f"Loading {data_args.dataset} dataset configs ...")
-            with open('../ts_backbone.yaml', 'r') as file:
+            with open('./sensorllm/model/ts_backbone.yaml', 'r') as file:
                 dataset_configs = yaml.safe_load(file)
 
             dataset_config = dataset_configs[data_args.dataset]
@@ -265,18 +242,13 @@ def train():
         logger.warning(
             "Pretrained TS backbone is trainable. fix_ts_encoder flag is set to False, ts net grad will be recorded.")
     else:
-        model.get_model().fix_ts_encoder = True  # * use with torch.inference_mode to control, not requires_grad for fsdp for second stage
+        model.get_model().fix_ts_encoder = True  # * use with torch.inference_mode to control
         logger.warning(
             "Pretrained TS backbone is fixed. fix_ts_encoder flag is set to True, ts net grad will not be recorded.")
 
-        if len(training_args.fsdp) == 0:
-            # if not training_args.stage_2:
-            model.get_model().pt_encoder_backbone.requires_grad_(
-                False)
-            logger.warning("Set requires_grad of Pretrained TS backbone to False")
-        else:
-            logger.warning(
-                "set requires_grad of Pretrained TS backbone as True for fsdp, use fix_ts_encoder flag to control with torch.no_grad() instead")
+        logger.warning("Set requires_grad of Pretrained TS backbone to False")
+        model.get_model().pt_encoder_backbone.requires_grad_(
+            False)
 
     if training_args.tune_mm_mlp_adapter:
         # * not fix the projection layer
@@ -307,42 +279,16 @@ def train():
                                                           fix_llm=training_args.fix_llm, dataset=data_args.dataset)
         else:
             model.initialize_tokenizer_ts_backbone_config_wo_embedding(tokenizer=tokenizer, dataset=data_args.dataset)
-    # print(model.get_model())
-    model.get_model().load_start_end_tokens(dataset=data_args.dataset)
 
-    # initial_params = {name: param.clone().detach().to('cpu') for name, param in model.named_parameters() if 'pt_encoder_backbone' in name}
+    model.get_model().load_start_end_tokens(dataset=data_args.dataset)
 
     ts_backbone_config = model.get_model().ts_backbone_config
     data_args.ts_backbone_config = ts_backbone_config
 
-    params_no_grad = [n for n, p in model.named_parameters() if not p.requires_grad]
-    if len(params_no_grad) > 0:
-        if training_args.fsdp is not None and len(training_args.fsdp) > 0:
-            if len(params_no_grad) < 10:
-                print('[WARNING] Attempting to use FSDP while {} parameters do not require gradients: {}'.format(
-                    len(params_no_grad), params_no_grad))
-            else:
-                print(
-                    '[WARNING] Attempting to use FSDP while {} parameters do not require gradients: {}...(omitted)'.format(
-                        len(params_no_grad), ', '.join(params_no_grad[:10])))
-            from torch.distributed.fsdp.fully_sharded_data_parallel import FullyShardedDataParallel as FSDP
-            def patch_FSDP_use_orig_params(func):
-                def wrap_func(*args, **kwargs):
-                    use_orig_params = kwargs.pop('use_orig_params', True)
-                    return func(*args, **kwargs, use_orig_params=use_orig_params)
-
-                return wrap_func
-
-            FSDP.__init__ = patch_FSDP_use_orig_params(FSDP.__init__)
-
     if not training_args.stage_2:
-        if not training_args.v_2:
-            logger.warning("Using the first version data_module of Stage 1")
-            data_module = make_ts_text_data_module(tokenizer=tokenizer, data_args=data_args)
-        else:
-            logger.warning("Using the second version data_module of Stage 1")
-            data_module = make_ts_text_data_module2(tokenizer=tokenizer, chronos_tokenizer=chronos_tokenizer,
-                                                    data_args=data_args)
+        logger.warning("Stage 1")
+        data_module = make_ts_text_data_module(tokenizer=tokenizer, chronos_tokenizer=chronos_tokenizer,
+                                                data_args=data_args)
     else:
         # * stage2
         if model_args.model_type == "CasualLM":
@@ -426,25 +372,11 @@ def train():
         trainer.train()
     trainer.save_state()
 
-    # params_updated = False
-    # for name, param in model.named_parameters():
-    #     if 'pt_encoder_backbone' in name:
-    #         if not torch.allclose(param.to('cpu'), initial_params[name]):
-    #             print(f"Parameters in {name} have been updated.")
-    #             params_updated = True
-    #         else:
-    #             print(f"Parameters in {name} have NOT been updated.")
-    #
-    # if params_updated:
-    #     print("ts_proj parameters were updated during training.")
-    # else:
-    #     print("ts_proj parameters were NOT updated during training.")
-
     safe_save_model_for_hf_trainer(trainer=trainer,
                                    output_dir=training_args.output_dir)
 
-    eval_results = trainer.evaluate()
-    print("Evaluation results:", eval_results)
+    # eval_results = trainer.evaluate()
+    # print("Evaluation results:", eval_results)
 
 
 if __name__ == "__main__":

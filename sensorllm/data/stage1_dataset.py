@@ -54,7 +54,7 @@ class UniChannelTimeSeriesDataset(Dataset):
         qa_path: a list of QA texts corresponding to each channel of each sample.
         """
 
-        super(UniChannelTimeSeriesDataset2, self).__init__()
+        super(UniChannelTimeSeriesDataset, self).__init__()
         self.data_path = data_path
         self.qa_path = qa_path
         self.tokenizer = tokenizer

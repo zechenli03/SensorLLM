@@ -266,6 +266,7 @@ class SensorLLMStage2LlamaForCausalLM(BaseSensorLLM, LlamaForCausalLM):
                 "mts_tokenizer_state": kwargs.get("mts_tokenizer_state", None),
             }
         )
+        model_inputs.pop("cache_position")
         return model_inputs
 
 

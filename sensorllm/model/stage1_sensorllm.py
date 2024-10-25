@@ -43,7 +43,9 @@ class SensorLLMStage1LlamaModel(BaseSensorLLMModel):
             ts_attention_mask: Optional[List[torch.Tensor]] = None,
             ts_tokenizer_state: Optional[List[Tuple[torch.Tensor, torch.Tensor]]] = None,
             return_dict: Optional[bool] = None,
+            cache_position: Optional[torch.LongTensor] = None,
     ) -> Union[Tuple, BaseModelOutputWithPast]:
+
         # Check the dimensions of input_ids
         if input_ids.dim() != 2:
             raise ValueError(f"Expected input_ids to be a 2D tensor, but got {input_ids.dim()}D tensor")
@@ -141,6 +143,7 @@ class SensorLLMStage1LlamaModel(BaseSensorLLMModel):
             output_attentions=output_attentions,
             output_hidden_states=output_hidden_states,
             return_dict=return_dict,
+            cache_position=cache_position,
         )
 
 
@@ -173,6 +176,7 @@ class SensorLLMStage1LlamaForCausalLM(BaseSensorLLM, LlamaForCausalLM):
             ts_attention_mask: Optional[List[torch.Tensor]] = None,
             ts_tokenizer_state: Optional[List[Tuple[torch.Tensor, torch.Tensor]]] = None,
             return_dict: Optional[bool] = None,
+            cache_position: Optional[torch.LongTensor] = None,
     ) -> Union[Tuple, CausalLMOutputWithPast]:
         output_attentions = (
             output_attentions
@@ -200,7 +204,8 @@ class SensorLLMStage1LlamaForCausalLM(BaseSensorLLM, LlamaForCausalLM):
             return_dict=return_dict,
             ts_token_ids=ts_token_ids,
             ts_attention_mask=ts_attention_mask,
-            ts_tokenizer_state=ts_tokenizer_state
+            ts_tokenizer_state=ts_tokenizer_state,
+            cache_position=cache_position,
         )
 
         hidden_states = outputs[0]
@@ -247,7 +252,6 @@ class SensorLLMStage1LlamaForCausalLM(BaseSensorLLM, LlamaForCausalLM):
             model_inputs = {"inputs_embeds": inputs_embeds}
         else:
             model_inputs = {"input_ids": input_ids}
-
         model_inputs.update(
             {
                 "past_key_values": past_key_values,
@@ -256,6 +260,7 @@ class SensorLLMStage1LlamaForCausalLM(BaseSensorLLM, LlamaForCausalLM):
                 "ts_token_ids": kwargs.get("ts_token_ids", None),
                 "ts_attention_mask": kwargs.get("ts_attention_mask", None),
                 "ts_tokenizer_state": kwargs.get("ts_tokenizer_state", None),
+                "cache_position": kwargs.get("cache_position", None),
             }
         )
         return model_inputs
