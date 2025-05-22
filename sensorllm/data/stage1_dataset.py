@@ -40,7 +40,7 @@ def preprocess_time_series2(
         assert channel_name in list(end_tokens_dict.keys()), f"End token {channel_name} not found"
         start_token = start_tokens_dict[channel_name]
         end_token = end_tokens_dict[channel_name]
-        modified_q = start_token + added_token + end_token + source["summary"]["Q"]
+        modified_q = start_token + added_token + end_token + source["Q"]
         modified_a = source["A"]+"\n\n"+source["summary"]["A"]
         modified_sources.append({"Q": modified_q, "A": modified_a, "type": source["type"]})
     return modified_sources
@@ -113,6 +113,22 @@ class UniChannelTimeSeriesDataset(Dataset):
                             [torch.from_numpy(data[:, i]).to(torch.float64) for i in range(data.shape[1])]
                         )
                         channel_list.extend(["x_acc", "y_acc", "z_acc", "x_g", "y_g", "z_g"])
+            elif self.dataset == "capture24":
+                for x_acc, y_acc, z_acc in zip(
+                        d["qa_pairs"]["x-axis accelerometer"],
+                        d["qa_pairs"]["y-axis accelerometer"],
+                        d["qa_pairs"]["z-axis accelerometer"]
+                ):
+                    assert x_acc["type"] == y_acc["type"] == z_acc["type"], "QA type values error"
+                    if x_acc["type"] not in ignore_qa_types:
+                        x_acc["summary"] = d['summaries']["x-axis accelerometer"]
+                        y_acc["summary"] = d['summaries']["y-axis accelerometer"]
+                        z_acc["summary"] = d['summaries']["z-axis accelerometer"]
+                        qa_dict.append([x_acc, y_acc, z_acc])
+                        ts_data.append(
+                            [torch.from_numpy(data[:, i]).to(torch.float64) for i in range(data.shape[1])]
+                        )
+                        channel_list.extend(["x_acc", "y_acc", "z_acc"])
             elif self.dataset == "mhealth":
                 for c_acc_x, c_acc_y, c_acc_z, la_acc_x, la_acc_y, la_acc_z, la_gs_x, la_gs_y, la_gs_z, rla_acc_x, rla_acc_y, rla_acc_z, rla_gs_x, rla_gs_y, rla_gs_z in zip(
                         d["qa_pairs"]["chest x-axis accelerometer"], d["qa_pairs"]["chest y-axis accelerometer"], d["qa_pairs"]["chest z-axis accelerometer"],
@@ -144,7 +160,7 @@ class UniChannelTimeSeriesDataset(Dataset):
                         rla_gs_z["summary"] = d['summaries']["right-lower-arm z-axis gyroscope"]
                         qa_dict.append([c_acc_x, c_acc_y, c_acc_z, la_acc_x, la_acc_y, la_acc_z, la_gs_x, la_gs_y, la_gs_z, rla_acc_x, rla_acc_y, rla_acc_z, rla_gs_x, rla_gs_y, rla_gs_z])
                         ts_data.append(
-                            [torch.from_numpy(data[:, i]).to(torch.float32) for i in range(data.shape[1])]
+                            [torch.from_numpy(data[:, i]).to(torch.float64) for i in range(data.shape[1])]
                         )
                         channel_list.extend(["c_acc_x", "c_acc_y", "c_acc_z", "la_acc_x", "la_acc_y", "la_acc_z", "la_gs_x", "la_gs_y", "la_gs_z", "rla_acc_x", "rla_acc_y", "rla_acc_z", "rla_gs_x", "rla_gs_y", "rla_gs_z"])
             elif self.dataset == "pamap" or self.dataset == "pamap50":
@@ -212,7 +228,7 @@ class UniChannelTimeSeriesDataset(Dataset):
                              acc_ankle_x, acc_ankle_y, acc_ankle_z, gyr_ankle_x, gyr_ankle_y, gyr_ankle_z, mag_ankle_x,
                              mag_ankle_y, mag_ankle_z])
                         ts_data.append(
-                            [torch.from_numpy(data[:, i]).to(torch.float32) for i in range(data.shape[1])]
+                            [torch.from_numpy(data[:, i]).to(torch.float64) for i in range(data.shape[1])]
                         )
                         channel_list.extend([
                             "acc_hand_x", "acc_hand_y", "acc_hand_z",
@@ -243,11 +259,7 @@ class UniChannelTimeSeriesDataset(Dataset):
         qa_dict = [item for sublist in qa_dict for item in sublist]
         ts_data = [item for sublist in ts_data for item in sublist]
 
-        if self.tokenizer is None:
-            print("Tokenizer is None, only use the first 120 data for inference.")
-            return ts_data[:3000], qa_dict[:3000], channel_list[:3000]
-        else:
-            return ts_data, qa_dict, channel_list
+        return ts_data, qa_dict, channel_list
 
     def __len__(self):
         return len(self.list_data_dict)
@@ -304,21 +316,6 @@ class UniChannelTimeSeriesDataset(Dataset):
                          ts_token_ids=ts_token_ids_list[0],
                          ts_attention_mask=ts_attention_mask_list[0],
                          ts_tokenizer_state=ts_tokenizer_state_list[0])
-
-        # if index == 0:
-        #     example = generate_chat_template([
-        #         {"role": "system", "content": self.SYS_INST},
-        #         {"role": "user", "content": sources[0]["Q"]},
-        #         {"role": "assistant", "content": sources[0]["A"]}], bos_token=self.tokenizer.bos_token, eos_token=self.tokenizer.eos_token,
-        #         add_generation_prompt=False)
-        #
-        #     input_exp = generate_chat_template([
-        #         {"role": "system", "content": self.SYS_INST},
-        #         {"role": "user", "content": sources[0]["Q"]}], bos_token=self.tokenizer.bos_token, eos_token=self.tokenizer.eos_token,
-        #         add_generation_prompt=True)
-        #     print(
-        #         f"Example: {example}\n\nInput example: {input_exp}\n\nTokenized example:{data_dict['input_ids'].tolist()}\n\nLabel: {data_dict['labels'].tolist()}\n\nts: {data_dict['ts_token_ids']}")
-        #     print("-------------" * 50)
 
         return data_dict
 

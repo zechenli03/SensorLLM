@@ -38,7 +38,7 @@ class ModelArguments:
 class DataArguments:
     dataset: str = field(
         default="usc-had",
-        metadata={"help": "usc-had, mhealth, pamap, pamap50, uci"},
+        metadata={"help": "usc-had, mhealth, pamap, pamap50, uci, capture24"},
     )
     data_path: str = field(
         default="",
@@ -62,7 +62,7 @@ class DataArguments:
                                  metadata={"help": "Q or Q+cot."})
     preprocess_type_eval: str = field(default='Q+cot',
                                       metadata={"help": "Q or Q+cot."})
-    add_ts_special_token_text: bool = field(default=True)
+    add_ts_special_token_text: bool = field(default=False)
 
 
 @dataclass

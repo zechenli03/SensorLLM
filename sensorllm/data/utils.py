@@ -95,6 +95,18 @@ def get_token_dict(dataset: str, data_args: dict):
             "y_g": data_args["default_y_gyro_end_token"],
             "z_g": data_args["default_z_gyro_end_token"]
         }
+    elif dataset == "capture24":
+        start_tokens_dict = {
+            "x_acc": data_args["default_x_acc_start_token"],
+            "y_acc": data_args["default_y_acc_start_token"],
+            "z_acc": data_args["default_z_acc_start_token"],
+        }
+
+        end_tokens_dict = {
+            "x_acc": data_args["default_x_acc_end_token"],
+            "y_acc": data_args["default_y_acc_end_token"],
+            "z_acc": data_args["default_z_acc_end_token"],
+        }
     elif dataset == "mhealth":
         start_tokens_dict = {
             "c_acc_x": data_args["default_chest_x_acc_start_token"],
@@ -222,6 +234,25 @@ def get_token_list(dataset: str, data_args: dict, add_ts_special_token_text: boo
             data_args["default_x_gyro_end_token"],
             data_args["default_y_gyro_end_token"],
             data_args["default_z_gyro_end_token"]
+        ]
+    elif dataset == "capture24":
+        if add_ts_special_token_text:
+            start_tokens_list = [
+                "x-axis accelerometer readings: " + data_args["default_x_acc_start_token"],
+                "y-axis accelerometer readings: " + data_args["default_y_acc_start_token"],
+                "z-axis accelerometer readings: " + data_args["default_z_acc_start_token"]
+            ]
+        else:
+            start_tokens_list = [
+                data_args["default_x_acc_start_token"],
+                data_args["default_y_acc_start_token"],
+                data_args["default_z_acc_start_token"],
+            ]
+
+        end_tokens_list = [
+            data_args["default_x_acc_end_token"],
+            data_args["default_y_acc_end_token"],
+            data_args["default_z_acc_end_token"],
         ]
     elif dataset == "mhealth":
         if add_ts_special_token_text:
@@ -447,6 +478,10 @@ def preprocess_cls(
         inputs = [added_str for _ in sources]
     elif preprocess_type == "smry+Q":
         inputs = [added_str + '\n' + s["smry"] + '\n' + s["Q"] for s in sources]
+    elif preprocess_type == "smry+meta":
+        inputs = [added_str + '\n' + s["smry"] + '\n' + s["info_text"] for s in sources]
+    elif preprocess_type == "smry+meta+Q":
+        inputs = [added_str + '\n' + s["smry"] + '\n' + s["info_text"] + '\n' + s["Q"] for s in sources]
     elif preprocess_type == "smry+corr":
         inputs = [added_str + '\n' + s["smry"] + '\n' + s["corr_text"] for s in sources]
     elif preprocess_type == "smry+corr+Q":

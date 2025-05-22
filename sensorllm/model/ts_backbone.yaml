@@ -3,8 +3,8 @@ ts_backbone_type: "chronos"
 chronos_model:
   name: "chronos-t5-large"
   encoder_output_dim: 1024
-  projection_hidden_layer: 1
-  projection_hidden_dim: [2048]
+  projection_hidden_layer: 2
+  projection_hidden_dim: [2048, 3072]
   last_token: true
 
 dropout_rate: 0.3
@@ -255,3 +255,25 @@ pamap:
   default_hand_y_mag_end_token: "<hand_y_mag_end>"
   default_hand_z_mag_start_token: "<hand_z_mag_start>"
   default_hand_z_mag_end_token: "<hand_z_mag_end>"
+
+capture24:
+  id2label:
+    0: 'sleep'
+    1: 'sitting'
+    2: 'household-chores'
+    3: 'walking'
+    4: 'vehicle'
+    5: 'bicycling'
+    6: 'mixed-activity'
+    7: 'standing'
+    8: 'manual-work'
+    9: 'sports'
+  num_labels: 10
+  channel_num: 3
+  sample_rate: 50
+  default_x_acc_start_token: "<x_acc_start>"
+  default_x_acc_end_token: "<x_acc_end>"
+  default_y_acc_start_token: "<y_acc_start>"
+  default_y_acc_end_token: "<y_acc_end>"
+  default_z_acc_start_token: "<z_acc_start>"
+  default_z_acc_end_token: "<z_acc_end>"

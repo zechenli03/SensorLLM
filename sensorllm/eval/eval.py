@@ -7,7 +7,7 @@ import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from sensorllm.model import *
-from sensorllm.data import UniChannelTimeSeriesDataset2
+from sensorllm.data import UniChannelTimeSeriesDataset
 from sensorllm.data.utils import generate_chat_template
 from sensorllm.utils import disable_torch_init
 import warnings
@@ -48,7 +48,7 @@ def parse_config():
 
 def load_dataset(data_path, qa_path, chronos_tokenizer):
     print("Loading validation datasets.")
-    dataset = UniChannelTimeSeriesDataset2(
+    dataset = UniChannelTimeSeriesDataset(
         data_path=data_path,
         qa_path=qa_path,
         tokenizer=None,  # * load ts and QA
@@ -95,7 +95,7 @@ def init_model(args):
         model_name,
         padding_side="left"
     )
-    model = SensorLLMStage1V2LlamaForCausalLM.from_pretrained(model_name, low_cpu_mem_usage=False, use_cache=True,
+    model = SensorLLMStage1LlamaForCausalLM.from_pretrained(model_name, low_cpu_mem_usage=False, use_cache=False,
                                                               torch_dtype=args.torch_dtype).cuda() 
     model.get_model().load_pt_encoder_backbone_checkpoint(args.pt_encoder_backbone_ckpt,
                                                           tc=args.tokenize_method,
@@ -115,7 +115,7 @@ def init_model(args):
 
 
 def generate_outputs(model, tokenizer, inputs, ts_token_ids, ts_attention_mask, do_sample=True, temperature=0.6,
-                     top_k=50, max_length=4096, top_p=0.9):
+                     top_k=50, max_length=8192, top_p=0.9):
     model.eval()
     model.get_model().pt_encoder_backbone.eval()
     terminators = [
@@ -128,7 +128,7 @@ def generate_outputs(model, tokenizer, inputs, ts_token_ids, ts_attention_mask, 
             ts_token_ids=ts_token_ids,
             ts_attention_mask=ts_attention_mask,
             do_sample=do_sample,
-            use_cache=True,
+            use_cache=False,
             temperature=temperature,
             top_k=top_k,
             max_new_tokens=max_length,
@@ -148,11 +148,23 @@ def generate_outputs(model, tokenizer, inputs, ts_token_ids, ts_attention_mask, 
 
 
 def start_generation(model, tokenizer, dataloader, output_dir, output_file_name):
-    results = {"prompt": SYS_INST}
-    responses = []
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(output_dir, output_file_name)
+
+    results = {"prompt": SYS_INST, "results": []}
+    if os.path.exists(output_file):
+        # 如果文件已存在，加载现有结果
+        with open(output_file, 'r') as f:
+            results = json.load(f)
+
+    processed_count = len(results["results"])
 
     o_i = 0
-    for batch in tqdm(dataloader):
+    for batch_idx, batch in enumerate(tqdm(dataloader)):
+        if batch_idx * dataloader.batch_size < processed_count:
+            continue
+        print(f"start from id {batch_idx}...")
+
         ts_token_ids = [ts_tensor.cuda() for ts_tensor in batch["ts_token_ids"]]  # * tensor of B, N.
         ts_attention_mask = [ts_tensor.cuda() for ts_tensor in batch["ts_attention_mask"]]
 
@@ -171,35 +183,37 @@ def start_generation(model, tokenizer, dataloader, output_dir, output_file_name)
                                    ts_attention_mask)  # List of str, length is B
 
         # saving results
+        batch_results = []
         for q, gt, output, tp, ts in zip(questions, ground_truths, outputs, types, ts_token_ids):
-            responses.append({
+            result = {
                 "questions": q,
                 "ground_truth": gt,
                 "model_output": output,
                 "model_len": len(ts[0]),
                 "type": tp
-            })
+            }
+            batch_results.append(result)
             if o_i < 10:
                 tqdm.write(f"Type: {tp}\nOutput: {output}\nGround-truth: {gt}\n\n")
                 tqdm.write("---------" * 30)
-        o_i += 1
-    results["results"] = responses
+            o_i += 1
+        results["results"].extend(batch_results)
 
-    evaluate_generation(results, output_dir, output_file_name)
+        if batch_idx % 10 == 0:  # 每10个批次保存一次
+            save_results(results, output_file)
 
-
-def evaluate_generation(results, output_dir, output_file_name):
-
-    os.makedirs(output_dir, exist_ok=True)
-    # save the results to a JSON file
-    with open(os.path.join(output_dir, output_file_name), 'w') as fp:
-        json.dump(results, fp, indent=2)
-
-    # * print info
-    print(f"Saved results to {os.path.join(output_dir, output_file_name)}")
-
+    save_results(results, output_file)
     return results
 
+def save_results(results, output_file):
+    temp_file = output_file + '.tmp'
+    with open(temp_file, 'w') as f:
+        json.dump(results, f, indent=2)
+
+    if os.path.exists(output_file):
+        os.replace(temp_file, output_file)
+    else:
+        os.rename(temp_file, output_file)
 
 
 def eval(args):

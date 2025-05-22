@@ -42,8 +42,15 @@ def preprocess_time_series_CLS_stage2(
 ) -> Sequence[Dict[str, str]]:
     modified_sources = []
     for index, source in enumerate(sources):
-        modified_sources.append({"Q": source["Q"], "smry": source["smry"], "trend_text": source["trend_text"],
-                                 "corr_text": source["corr_text"], "answer": source["A"], "label": source["label"]})
+        modified_sources.append({
+            "Q": source.get("Q", ""),
+            "smry": source.get("smry", ""),
+            "trend_text": source.get("trend_text", ""),
+            "corr_text": source.get("corr_text", ""),
+            "info_text": source.get("info_text", ""),
+            "answer": source.get("A", ""),
+            "label": source.get("label", "")
+        })
     return modified_sources
 
 
@@ -63,6 +70,8 @@ class MultiChannelTimeSeriesDatasetStage2(Dataset):
 
         if dataset == 'usc-had':
             self.SYS_INST = "The assistant is provided with time-series readings of six sensor channels, including three accelerometer channels (in g) and three gyroscope channels (in dps). Each channel contains 200 data representing information extracted from the same 2-second time window at a sampling rate of 100Hz. Please analyze the trends and patterns in each channel to identify the correct activity type from the following twelve activity options:\n\n1. Walking Forward\n2. Walking Left\n3. Walking Right\n4. Walking Upstairs\n5. Walking Downstairs\n6. Running Forward\n7. Jumping\n8. Sitting\n9. Standing\n10. Sleeping\n11. Elevator Up\n12. Elevator Down\n\nProvide the predicted activity as both the number and the name at the end."
+        elif dataset == 'capture24':
+            self.SYS_INST = "The assistant is provided with time-series readings of three accelerometer channels (in g). Each channel contains 500 data representing information extracted from the same 10-second time window at a sampling rate of 50Hz. Please analyze the trends and patterns in each channel to identify the correct activity type from the following 10 activity options:\n\n1. sleep\n2. sitting\n3. household-chores\n4. walking\n5. vehicle\n6. bicycling\n7. mixed-activity\n8. standing\n9. manual-work\n10. sports\n\nProvide the predicted activity as both the number and the name at the end."
         elif dataset == 'mhealth':
             self.SYS_INST = "The assistant is provided with time-series readings of 15 sensor channels, including acceleration sensors (in m/s^2) and gyroscope sensors (in deg/s). Each channel contains 100 data representing information extracted from the same 2-second time window at a sampling rate of 50Hz. Please analyze the trends and patterns in each channel to identify the correct activity type from the following twelve activity options:\n\n1. Standing still\n2. Sitting and relaxing\n3. Lying down\n4. Walking\n5. Climbing stairs\n6. Waist bends forward\n7. Frontal elevation of arms\n8. Knees bending (crouching)\n9. Cycling\n10. Jogging\n11. Running\n12. Jump front & back\n\nProvide the predicted activity as both the number and the name at the end."
         elif dataset == 'pamap50':
@@ -104,14 +113,14 @@ class MultiChannelTimeSeriesDatasetStage2(Dataset):
             data_file = pickle.load(f)
         with open(self.qa_path, "r") as file:
             qa_file = json.load(file)
-        data_file = np.array(data_file, dtype=np.float32)
+        data_file = np.array(data_file, dtype=np.float64)
         ts_data = []
         qa_dict = []
         assert len(data_file) == len(qa_file["dataset"])
         for q in qa_file["dataset"]:
             data_idx = q["index"]
             data = data_file[int(data_idx)]
-            ts_data.append([torch.from_numpy(data[:, i]).to(torch.float32) for i in range(data.shape[1])])
+            ts_data.append([torch.from_numpy(data[:, i]).to(torch.float64) for i in range(data.shape[1])])
             qa_dict.append(q["qa_pair"])
         assert len(ts_data) == len(qa_dict), "ts_data, qa_dict, length not matched"
 
@@ -274,7 +283,7 @@ class MultiChannelTimeSeriesCLSDatasetStage2(Dataset):
         dataset = data_args.dataset
 
 
-        self.ts_data, self.list_data_dict, self.class_weights = self._flatten_data(shuffle, dataset)
+        self.ts_data, self.list_data_dict, self.class_weights = self._flatten_data(shuffle)
 
         self.data_args = data_args.ts_backbone_config
 
@@ -299,16 +308,12 @@ class MultiChannelTimeSeriesCLSDatasetStage2(Dataset):
             added_str += start_token + added_token + end_token + '\n'
         self.added_str = added_str
 
-    def _flatten_data(self, shuffle: bool, dataset: str):
+    def _flatten_data(self, shuffle: bool):
         logging.warning(f"Loading {self.split} data...")
         with open(self.data_path, "rb") as f:
             data_file = pickle.load(f)
         with open(self.qa_path, "r") as file:
             qa_file = json.load(file)
-        if dataset == "uci":
-            data_file = np.array(data_file, dtype=np.float64)
-        else:
-            data_file = np.array(data_file, dtype=np.float32)
         ts_data = []
         qa_dict = []
         label_list = []
@@ -316,10 +321,7 @@ class MultiChannelTimeSeriesCLSDatasetStage2(Dataset):
         for q in qa_file["dataset"]:
             data_idx = q["index"]
             data = data_file[int(data_idx)]
-            if dataset == "uci":
-                ts_data.append([torch.from_numpy(data[:, i]).to(torch.float64) for i in range(data.shape[1])])
-            else:
-                ts_data.append([torch.from_numpy(data[:, i]).to(torch.float32) for i in range(data.shape[1])])
+            ts_data.append([torch.from_numpy(data[:, i]).to(torch.float64) for i in range(data.shape[1])])
             answer = q["qa_pair"]["A"]
             try:
                 label = int(self.label2id[answer])
@@ -402,6 +404,7 @@ class MultiChannelTimeSeriesCLSDatasetStage2(Dataset):
                 smry=sources[0]["smry"],
                 trend_text=sources[0]["trend_text"],
                 corr_text=sources[0]["corr_text"],
+                info_text=sources[0]["info_text"],
                 answer=sources[0]["answer"],
                 label=sources[0]["label"],
                 mts_token_ids=mts_token_ids_list[0],
