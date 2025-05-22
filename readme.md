@@ -1,10 +1,10 @@
 <h1 align="center"><img src="asset/logo_left.jpg" align="center" width="5%"><strong> SensorLLM</strong><img src="asset/logo_right.png" align="center" width="5%"></h1>
 <h1 align="center"><strong> Human-Intuitive Alignment of Multivariate Sensor Data with LLMs for Activity Recognition</strong></h1>
   <p align="center">
-    <a href='https://scholar.google.com/citations?user=EVOzBF4AAAAJ&hl=en' target='_blank'>Zechen Li</a><sup>1</sup>&emsp;&emsp;&emsp;
-    <a href='https://scholar.google.com/citations?user=250tnREAAAAJ&hl=en' target='_blank'>Shohreh Deldari</a><sup>1</sup>&emsp;&emsp;&emsp;
-    <a href='https://openreview.net/profile?id=~Linyao_Chen1' target='_blank'>Linyao Chen</a><sup>2</sup>&emsp;&emsp;&emsp;
-    <a href='https://scholar.google.com/citations?user=KwhLl7IAAAAJ&hl' target='_blank'>Hao Xue</a><sup>1</sup>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+    <a href='https://scholar.google.com/citations?user=EVOzBF4AAAAJ&hl=en' target='_blank'>Zechen Li</a><sup>1</sup>&emsp;&emsp;
+    <a href='https://scholar.google.com/citations?user=250tnREAAAAJ&hl=en' target='_blank'>Shohreh Deldari</a><sup>1</sup>&emsp;&emsp;
+    <a href='https://openreview.net/profile?id=~Linyao_Chen1' target='_blank'>Linyao Chen</a><sup>2</sup>&emsp;&emsp;
+    <a href='https://scholar.google.com/citations?user=KwhLl7IAAAAJ&hl' target='_blank'>Hao Xue</a><sup>1</sup>&emsp;&emsp;
     <a href='https://fsalim.github.io' target='_blank'>Flora D. Salim</a><sup>1</sup>
     <br><br>
     <sup>1</sup> University of New South Wales, Sydney<br/>
