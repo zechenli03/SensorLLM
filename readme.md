@@ -1,11 +1,11 @@
 <h1 align="center"><img src="asset/logo_left.jpg" align="center" width="5%"><strong> SensorLLM</strong><img src="asset/logo_right.png" align="center" width="5%"></h1>
 <h1 align="center"><strong> Human-Intuitive Alignment of Multivariate Sensor Data with LLMs for Activity Recognition</strong></h1>
   <p align="center">
-    <a href='https://scholar.google.com/citations?user=EVOzBF4AAAAJ&hl=en' target='_blank'>Zechen Li<sup>1</sup></a>&emsp;
-    <a href='https://scholar.google.com/citations?user=250tnREAAAAJ&hl=en' target='_blank'>Shohreh Deldari<sup>1</sup></a>&emsp;
-    <a href='https://openreview.net/profile?id=~Linyao_Chen1' target='_blank'>Linyao Chen<sup>2</sup></a>&emsp;
-    <a href='https://scholar.google.com/citations?user=KwhLl7IAAAAJ&hl' target='_blank'>Hao Xue<sup>1</sup></a>&emsp;
-    <a href='https://fsalim.github.io' target='_blank'>Flora D. Salim<sup>1</sup></a>&emsp;
+    <a href='https://scholar.google.com/citations?user=EVOzBF4AAAAJ&hl=en' target='_blank'>Zechen Li</a><sup>1</sup>&emsp;&emsp;&emsp;
+    <a href='https://scholar.google.com/citations?user=250tnREAAAAJ&hl=en' target='_blank'>Shohreh Deldari</a><sup>1</sup>&emsp;&emsp;&emsp;
+    <a href='https://openreview.net/profile?id=~Linyao_Chen1' target='_blank'>Linyao Chen</a><sup>2</sup>&emsp;&emsp;&emsp;
+    <a href='https://scholar.google.com/citations?user=KwhLl7IAAAAJ&hl' target='_blank'>Hao Xue</a><sup>1</sup>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+    <a href='https://fsalim.github.io' target='_blank'>Flora D. Salim</a><sup>1</sup>
     <br><br>
     <sup>1</sup> University of New South Wales, Sydney<br/>
     <sup>2</sup> University of Tokyo
@@ -18,7 +18,6 @@
 
 ## 🌟 Overview
 
-------
 **SensorLLM** is a two-stage framework that aligns sensor time series with human-intuitive text, enabling LLMs to interpret complex numerical data and achieve SOTA human activity recognition across varying sensor types, counts, and sequence lengths.
 <div style="text-align: center;">
     <img src="asset/sensorllm_model.png" alt="sensorllm_model" width=100% >
@@ -37,7 +36,6 @@ To apply SensorLLM to other datasets, please refer to the code and configuration
 
 ## 🚀 Getting started
 
-------
 > Currently supported pretrained models:
 > - Time-series models: [Chronos](https://arxiv.org/abs/2403.07815)  
 > - Language models: [LLaMA](https://arxiv.org/abs/2407.21783)  
@@ -152,7 +150,6 @@ See [`./sensorllm/data/utils.py`](./sensorllm/data/utils.py) for all available p
 
 ## 🌍 Citation
 
-------
 If you find this repository useful for your research, please cite our paper:
 
 ```
@@ -169,7 +166,11 @@ If you find this repository useful for your research, please cite our paper:
 
 ## 📄 License
 
-------
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
 <br />
 This work is under the <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
+
+
+## 📩 Contact
+
+If you have any questions or suggestions, feel free to contact Zechen at `zechen.li(at)unsw(dot)edu(dot)au`.
