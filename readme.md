@@ -29,7 +29,7 @@
 - ***Task-Aware Tuning Stage*** handles multi-channel, multi-sensor data for downstream human activity recognition (HAR).
 
 ### 📂 Datasets
-The current implementation supports five HAR datasets: USC-HAD, UCI-HAR, MHealth, Capture-24, and PAMAP2.
+The current implementation supports five HAR datasets: [`USC-HAD`](https://sipi.usc.edu/had/), [`UCI-HAR`](https://archive.ics.uci.edu/dataset/240/human+activity+recognition+using+smartphones), [`MHealth`](https://archive.ics.uci.edu/dataset/319/mhealth+dataset), [`Capture-24`](https://ora.ox.ac.uk/objects/uuid:99d7c092-d865-4a19-b096-cc16440cd001), and [`PAMAP2`](https://archive.ics.uci.edu/dataset/231/pamap2+physical+activity+monitoring).
 
 To apply SensorLLM to other datasets, please refer to the code and configuration examples provided for the supported datasets. In particular, you may need to modify the corresponding entries in [`ts_backbone.yaml`](./sensorllm/model/ts_backbone.yaml) and adapt the data loading logic in the [`./sensorllm/data`](./sensorllm/data) folder to match your dataset’s format.
 
@@ -153,7 +153,7 @@ See [`./sensorllm/data/utils.py`](./sensorllm/data/utils.py) for all available p
 If you find this repository useful for your research, please cite our paper:
 
 ```
-@misc{li2025sensorllmhumanintuitivealignmentmultivariate,
+@misc{li2025sensorllm,
       title={SensorLLM: Human-Intuitive Alignment of Multivariate Sensor Data with LLMs for Activity Recognition}, 
       author={Zechen Li and Shohreh Deldari and Linyao Chen and Hao Xue and Flora D. Salim},
       year={2025},
