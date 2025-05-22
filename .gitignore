@@ -1,0 +1,15 @@
+dataset
+chronos
+MHEALTHDATASET
+UCIDataset
+PAMAP2_Dataset
+USC-HAD
+capture24
+
+# 忽略项目内特定目录
+SensorQA/
+SensorQA_anonymous/
+SensorQA_ARR_anonymous/
+
+# 忽略所有 Jupyter Notebook 文件
+*.ipynb
